@@ -20,10 +20,10 @@ class TextFieldPin extends StatefulWidget {
   TextFieldPin(
       {Key key,
       this.onOtpCallback,
-      this.boxSize = 46,
+      this.boxSize = 64,
       this.borderStyle,
       this.filled = false,
-      this.filledColor = Colors.grey,
+      this.filledColor = Colors.blue,
       this.codeLength = 5,
       this.textStyle,
       this.margin = 16,
@@ -69,7 +69,7 @@ class _TextFieldPinState extends State<TextFieldPin> {
     _startListeningOtpCode();
     if (widget.borderStyeAfterTextChange == null) {
       _borderAfterTextChange = OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey, width: 1));
     } else {
       _borderAfterTextChange = widget.borderStyeAfterTextChange;
@@ -156,13 +156,20 @@ class _TextFieldPinState extends State<TextFieldPin> {
 
     if (_border == null) {
       _border = OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(
           color: Colors.grey,
-          width: 1.0,
         ),
       );
     }
+
+    List<Widget> pins = List<Widget>.generate(
+        mListOtpData.length, (int index) => _singlePinView(index)).toList();
+    return Container(
+      child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: pins),
+    );
 
     return Container(
       height: widget.boxSize,
@@ -290,6 +297,77 @@ class _TextFieldPinState extends State<TextFieldPin> {
           ]),
     );
   }
+
+  _singlePinView(int i) {
+    return Flexible(
+        flex: 3,
+        child: Container(
+          margin: EdgeInsets.all(4),
+          child: Center(
+            child: textFieldFill(
+              focusNode: focusNode[i],
+              textEditingController: textController[i],
+              border: _getBorder(i),
+              isFilled: _isFilled(i),
+              onTextChange: (value) {
+                if(value.toString().length > 1 && (i+1 == textController.length  ||textController[i+1].text.length > 0)){
+                  textController[i].text = value.toString()[1];
+                  if(i+1 == textController.length){
+                    _nextFocus = i - 1;
+                    FocusScope.of(context)
+                        .requestFocus(focusNode[_nextFocus]);
+                    Future.delayed(Duration(milliseconds: 2),(){
+                      _nextFocus = _nextFocus + 1;
+                      FocusScope.of(context)
+                          .requestFocus(focusNode[_nextFocus]);
+                    });
+                  }else{
+                    _nextFocus = i + 1;
+                    FocusScope.of(context)
+                        .requestFocus(focusNode[_nextFocus]);
+                  }
+
+                  _otpNumberCallback(i, false);
+                }else{
+                  _otpNumberCallback(i, false);
+
+                  if (value.toString().length > 0) {
+                    if(value.toString().length > 1){
+                      _nextFocus = i + 1;
+                      FocusScope.of(context)
+                          .requestFocus(focusNode[_nextFocus]);
+                      textController[i].text = value.toString()[0];
+                      textController[i + 1].text = value.toString()[1];
+                      if (i + 2 < focusNode.length) {
+                        _nextFocus = i + 2;
+                        FocusScope.of(context)
+                            .requestFocus(focusNode[_nextFocus]);
+                      }
+                    }else {
+                      if (_nextFocus != mListOtpData.length) {
+                        _nextFocus = i + 1;
+                        FocusScope.of(context)
+                            .requestFocus(focusNode[_nextFocus]);
+                      } else {
+                        _nextFocus = (mListOtpData.length - 1) - 1;
+                      }
+                    }
+                  } else {
+                    if (i >= 1) {
+                      _nextFocus = i - 1;
+                      FocusScope.of(context)
+                          .requestFocus(focusNode[_nextFocus]);
+                    } else {
+                      _nextFocus = 1;
+                    }
+                  }
+                }
+              },
+            ),
+          ),
+        ));
+  }
+
 }
 
 class OtpDefaultData {
