@@ -131,7 +131,7 @@ class _TextFieldPinState extends State<TextFieldPin> {
   /// check if value already in hashmap ? update value : insert value
   /// convert all values hasmap to string, set as result otp
   _otpNumberCallback(int i, bool isAutoFill) {
-    if (mapResult.containsKey(i)) {
+    /*if (mapResult.containsKey(i)) {
       mapResult.update(i, (e) => textController[i].text);
     } else {
       mapResult.putIfAbsent(i, () => textController[i].text);
@@ -141,7 +141,12 @@ class _TextFieldPinState extends State<TextFieldPin> {
         .replaceAll("(", "")
         .replaceAll(")", "")
         .replaceAll(",", "")
-        .replaceAll(" ", "");
+        .replaceAll(" ", "");*/
+    _result = "";
+    for(var controller in textController){
+      _result = _result+controller.text.toString();
+    }
+    _result = _result.trim();
     widget.onOtpCallback(_result, isAutoFill);
   }
 
@@ -180,23 +185,56 @@ class _TextFieldPinState extends State<TextFieldPin> {
                     border: _getBorder(i),
                     isFilled: _isFilled(i),
                     onTextChange: (value) {
-                      _otpNumberCallback(i, false);
-
-                      if (value.toString().length > 0) {
-                        if (_nextFocus != mListOtpData.length) {
-                          _nextFocus = i + 1;
-                          FocusScope.of(context)
-                              .requestFocus(focusNode[_nextFocus]);
-                        } else {
-                          _nextFocus = (mListOtpData.length-1) - 1;
-                        }
-                      } else {
-                        if (i >= 1) {
+                      if(value.toString().length > 1 && (i+1 == textController.length  ||textController[i+1].text.length > 0)){
+                        textController[i].text = value.toString()[1];
+                        if(i+1 == textController.length){
                           _nextFocus = i - 1;
                           FocusScope.of(context)
                               .requestFocus(focusNode[_nextFocus]);
+                          Future.delayed(Duration(milliseconds: 2),(){
+                            _nextFocus = _nextFocus + 1;
+                            FocusScope.of(context)
+                                .requestFocus(focusNode[_nextFocus]);
+                          });
+                        }else{
+                          _nextFocus = i + 1;
+                          FocusScope.of(context)
+                              .requestFocus(focusNode[_nextFocus]);
+                        }
+
+                        _otpNumberCallback(i, false);
+                      }else{
+                        _otpNumberCallback(i, false);
+
+                        if (value.toString().length > 0) {
+                          if(value.toString().length > 1){
+                            _nextFocus = i + 1;
+                            FocusScope.of(context)
+                                .requestFocus(focusNode[_nextFocus]);
+                            textController[i].text = value.toString()[0];
+                            textController[i + 1].text = value.toString()[1];
+                            if (i + 2 < focusNode.length) {
+                              _nextFocus = i + 2;
+                              FocusScope.of(context)
+                                  .requestFocus(focusNode[_nextFocus]);
+                            }
+                          }else {
+                            if (_nextFocus != mListOtpData.length) {
+                              _nextFocus = i + 1;
+                              FocusScope.of(context)
+                                  .requestFocus(focusNode[_nextFocus]);
+                            } else {
+                              _nextFocus = (mListOtpData.length - 1) - 1;
+                            }
+                          }
                         } else {
-                          _nextFocus = 1;
+                          if (i >= 1) {
+                            _nextFocus = i - 1;
+                            FocusScope.of(context)
+                                .requestFocus(focusNode[_nextFocus]);
+                          } else {
+                            _nextFocus = 1;
+                          }
                         }
                       }
                     },
