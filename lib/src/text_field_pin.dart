@@ -40,10 +40,10 @@ class TextFieldPin extends StatefulWidget {
 class _TextFieldPinState extends State<TextFieldPin> {
   _TextFieldPinState();
 
-  List<FocusNode> focusNode = List();
-  List<TextEditingController> textController = List();
+  List<FocusNode> focusNode = [];
+  List<TextEditingController> textController = [];
 
-  List<OtpDefaultData> mListOtpData = List();
+  List<OtpDefaultData> mListOtpData = [];
   HashMap<int, String> mapResult = HashMap();
 
   String? _smsCode = "";
@@ -293,7 +293,7 @@ class _TextFieldPinState extends State<TextFieldPin> {
           onChanged: onTextChange,
           controller: textEditingController,
           inputFormatters: <TextInputFormatter>[
-            // WhitelistingTextInputFormatter.digitsOnly
+            FilteringTextInputFormatter.digitsOnly,
           ]),
     );
   }
