@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
 
   /// get signature code
   _getSignatureCode() async {
-    String signature = await SmsRetrieved.getAppSignature();
+    String? signature = await SmsRetrieved.getAppSignature();
     print("signature $signature");
   }
 
