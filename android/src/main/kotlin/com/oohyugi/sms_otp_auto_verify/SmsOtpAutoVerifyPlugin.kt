@@ -23,7 +23,7 @@ class SmsOtpAutoVerifyPlugin(private val activity: Activity) : MethodCallHandler
         @JvmStatic
         fun registerWith(registrar: Registrar) {
             val channel = MethodChannel(registrar.messenger(), "sms_otp_auto_verify")
-            channel.setMethodCallHandler(SmsOtpAutoVerifyPlugin(registrar.activity()))
+            channel.setMethodCallHandler(SmsOtpAutoVerifyPlugin(registrar.activity()!!))
         }
     }
 
